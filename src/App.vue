@@ -8,21 +8,19 @@
     </nav>
 
     <div class="container">
-      <div class="column">
-        <div class="large-12 medium-12 small-12 cell">
-          <label>Old Measure Package
-            <input type="file" id="measure-old" ref="measure-old" v-on:change="oldMeasureUpload()"/>
-          </label>
-        </div>
+      <div class="large-12 medium-12 small-12 cell">
+        <label>Old Measure Package
+          <input type="file" id="measure-old" ref="measureOld" v-on:change="oldMeasureUpload()"/>
+        </label>
       </div>
-      <div class="column">
-        <div class="large-12 medium-12 small-12 cell">
-          <label>New Measure Package
-            <input type="file" id="measure-new" ref="measure-new" v-on:change="newMeasureUpload()"/>
-          </label>
-        </div>
+      <div class="large-12 medium-12 small-12 cell">
+        <label>New Measure Package
+          <input type="file" id="measure-new" ref="measureNew" v-on:change="newMeasureUpload()"/>
+        </label>
       </div>
-      <button v-on:click="submitFiles()">Create Diff</button>
+      <button :disabled="!filesSelected"
+        id="createDiffBtn"
+        v-on:click.prevent="createDiff()">Create Diff</button>
     </div>
   </div>
 </template>
@@ -44,14 +42,34 @@ export default {
     return {
       oldMeasure: '',
       newMeasure: '',
+      diff: '',
     };
+  },
+  computed: {
+    filesSelected() {
+      return !!this.oldMeasure && !!this.newMeasure;
+    },
   },
   methods: {
     oldMeasureUpload() {
       this.oldMeasure = this.$refs.measureOld.files;
     },
     newMeasureUpload() {
-      this.oldMeasure = this.$refs.measureNew.files;
+      this.newMeasure = this.$refs.measureNew.files;
+    },
+    validatePackages() {
+      return this.oldMeasure && this.newMeasure;
+    },
+    calculateDiff() {},
+    displayDiff() {},
+    createDiff() {
+      if (!this.validatePackages()) {
+        console.log('Invalid Packages');
+      } else {
+        console.log('Creating Diff');
+      }
+      this.calculateDiff();
+      this.displayDiff();
     },
   },
 };
