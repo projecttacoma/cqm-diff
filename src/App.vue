@@ -13,14 +13,20 @@
           <input type="file" id="measure-old" ref="measureOld" v-on:change="oldMeasureUpload()"/>
         </label>
       </div>
+
       <div class="large-12 medium-12 small-12 cell">
         <label>New Measure Package
           <input type="file" id="measure-new" ref="measureNew" v-on:change="newMeasureUpload()"/>
         </label>
       </div>
+
       <button :disabled="!filesSelected"
         id="createDiffBtn"
         v-on:click.prevent="createDiff()">Create Diff</button>
+    </div>
+
+    <div>
+      {{ diff }}
     </div>
   </div>
 </template>
@@ -57,19 +63,21 @@ export default {
     newMeasureUpload() {
       this.newMeasure = this.$refs.measureNew.files;
     },
-    validatePackages() {
-      return this.oldMeasure && this.newMeasure;
+    packageIsValid(measurePackage) {
+      return !!measurePackage;
     },
-    calculateDiff() {},
-    displayDiff() {},
+    validatePackages() {
+      return this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
+    },
+    calculateDiff() {
+      this.diff = 'diff created';
+    },
     createDiff() {
       if (!this.validatePackages()) {
-        console.log('Invalid Packages');
+        this.diff = 'invalid packages';
       } else {
-        console.log('Creating Diff');
+        this.calculateDiff();
       }
-      this.calculateDiff();
-      this.displayDiff();
     },
   },
 };
