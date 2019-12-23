@@ -84,9 +84,11 @@ export default {
                 entries[i].getData(new zip.TextWriter(), (text) => {
                   measure[filename] = text;
                   reader.close(() => {
+                    // eslint-disable-next-line no-console
                     console.log(`${filename} complete.`);
                   });
                 }, (current, total) => {
+                  // eslint-disable-next-line no-console
                   console.info(`${filename}: ${current}/${total}`);
                 });
               }
@@ -94,6 +96,7 @@ export default {
           }
         });
       }, (error) => {
+        // eslint-disable-next-line no-console
         console.log(`Error reading zip: ${error}`);
       });
       return measure;
@@ -144,7 +147,6 @@ export default {
     },
     calculateDiff() {
       const libraryMap = this.createLibraryMap();
-      console.log(libraryMap);
       const oldFileNames = Object.keys(this.oldMeasure);
       for (let i = 0; i < oldFileNames.length; i += 1) {
         const oldFileName = oldFileNames[i];
