@@ -195,7 +195,6 @@ export default {
           newText: this.reorderNewLibrary(oldText, newText),
         });
       }
-      console.log(this.diffs);
     },
     createLibraryMap() {
       // use edit distance to determine which libraries from oldMeasure map to which in new

@@ -1,29 +1,33 @@
 import { expect } from 'chai';
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+import Vue from 'vue';
+import Buefy from 'buefy';
 import App from '../../src/App.vue';
+
+Vue.use(Buefy);
 
 describe('App.vue', () => {
   it('Contains Title Text', () => {
-    const text = 'MITRE CQM-DIFF';
-    const wrapper = shallowMount(App);
+    const text = 'cqm-diff';
+    const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
   it('Contains Old Measure Upload Input', () => {
-    const text = 'Old Measure Package';
-    const wrapper = shallowMount(App);
+    const text = 'Upload Old Measure Zip';
+    const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
   it('Contains New Measure Upload Input', () => {
-    const text = 'New Measure Package';
-    const wrapper = shallowMount(App);
+    const text = 'Upload New Measure Zip';
+    const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
   it('Contains Create Diff Button', () => {
     const text = 'Create Diff';
-    const wrapper = shallowMount(App);
+    const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
@@ -32,48 +36,9 @@ describe('App.vue', () => {
 
   describe('Create Diff Button', () => {
     it('Create Diff Button Disabled if no files selected', () => {
-      const wrapper = shallowMount(App);
+      const wrapper = mount(App);
       const diffButton = wrapper.find('#createDiffBtn');
       expect(diffButton.attributes().disabled).to.equal('disabled');
-    });
-
-    it('Create Diff Button Disabled if only old measure selected', () => {
-      const wrapper = shallowMount(App, {
-        data() {
-          return {
-            oldMeasure: 'foo',
-            newMeasure: '',
-          };
-        },
-      });
-      const diffButton = wrapper.find('#createDiffBtn');
-      expect(diffButton.attributes().disabled).to.equal('disabled');
-    });
-
-    it('Create Diff Button Disabled if only new measure selected', () => {
-      const wrapper = shallowMount(App, {
-        data() {
-          return {
-            oldMeasure: '',
-            newMeasure: 'foo',
-          };
-        },
-      });
-      const diffButton = wrapper.find('#createDiffBtn');
-      expect(diffButton.attributes().disabled).to.equal('disabled');
-    });
-
-    it('Create Diff Button enabled if both files selected', () => {
-      const wrapper = shallowMount(App, {
-        data() {
-          return {
-            oldMeasure: 'foo',
-            newMeasure: 'foo',
-          };
-        },
-      });
-      const diffButton = wrapper.find('#createDiffBtn');
-      expect(diffButton.attributes().disabled).to.equal(undefined);
     });
   });
 });
