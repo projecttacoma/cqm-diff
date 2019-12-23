@@ -1,52 +1,81 @@
 
 <template>
   <div id="app">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        MITRE CQM-DIFF
+    <section class="hero is-info">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            cqm-diff
+          </h1>
+          <h2 class="subtitle">
+            Upload two versions of an eCQM Measure Authoring Tool (MAT)
+            package (.zip files) and click "Create Diff" to see the changes
+            between their CQL files. </h2>
+        </div>
       </div>
-    </nav>
+    </section>
+    <div class="navbar-brand">
+    </div>
 
     <div class="container">
-      <div class="large-12 medium-12 small-12 cell">
-        <label>Old Measure Package
-          <input type="file" id="measure-old" ref="measureOld" v-on:change="oldMeasureUpload()"/>
-        </label>
+      <div class="columns">
+        <div class="column is-one-third">
+          <b-field class="file">
+              <b-upload v-model="oldMeasureFile">
+                <a class="button is-info">
+                  <b-icon icon="upload"></b-icon>
+                  <span>Upload Old Measure Zip</span>
+                </a>
+              </b-upload>
+              <span class="file-name" v-if="oldMeasureFile">
+                {{ oldMeasureFile.name }}
+              </span>
+          </b-field>
+        </div>
+        <div class="column is-one-third">
+          <b-field class="file">
+              <b-upload v-model="newMeasureFile">
+                <a class="button is-info">
+                  <b-icon icon="upload"></b-icon>
+                  <span>Upload New Measure Zip</span>
+                </a>
+              </b-upload>
+              <span class="file-name" v-if="newMeasureFile">
+                {{ newMeasureFile.name }}
+              </span>
+          </b-field>
+        </div>
+          <div class="column is-one-third">
+            <b-button :disabled="!filesSelected"
+              id="createDiffBtn"
+              class="is-primary"
+              v-on:click.prevent="createDiff()">Create Diff
+            </b-button>
+          <!-- <b-button :disabled="!diffCreated"
+            class="primary"
+            id="downloadDiffBtn"
+            v-on:click.prevent="downloadDiff()">Download Diff
+            </b-button> -->
+          </div>
+        </div>
+        <diff v-for="diff in diffs"
+              v-bind:key="diff"
+              v-bind:oldFileName="diff.oldFileName"
+              v-bind:newFileName="diff.newFileName"
+              v-bind:oldText="diff.oldText"
+              v-bind:newText="diff.newText">
+        </diff>
       </div>
-
-      <div class="large-12 medium-12 small-12 cell">
-        <label>New Measure Package
-          <input type="file" id="measure-new" ref="measureNew" v-on:change="newMeasureUpload()"/>
-        </label>
-      </div>
-
-      <button :disabled="!filesSelected"
-        id="createDiffBtn"
-        v-on:click.prevent="createDiff()">Create Diff</button>
-      <button :disabled="!diffCreated"
-        id="downloadDiffBtn"
-        v-on:click.prevent="downloadDiff()">Download Diff</button>
     </div>
-
-    <div id="diff">
-      <div v-for="diff in diffs" :key="diff.oldFileName">
-        Old: {{ diff.oldFileName }} New: {{ diff.newFileName }}
-        <code-diff :old-string="diff.oldText"
-                  :new-string="diff.newText"
-                  :context="1000"
-                  :outputFormat="`side-by-side`"/>
-      </div>
-    </div>
-  </div>
 </template>
 <script>
 /* TODO
   - CSS
   - download diffs button
 */
-import CodeDiff from 'vue-code-diff';
 import * as EditDistance from 'levenshtein-edit-distance';
 import * as Zip from '../lib/zip';
+import Diff from '@/components/Diff.vue';
 
 const { zip } = Zip;
 
@@ -57,11 +86,13 @@ zip.workerScripts = {
 
 export default {
   name: 'cqm-diff',
-  components: { CodeDiff },
+  components: {
+    Diff,
+  },
   data() {
     return {
-      oldMeasure: '',
-      newMeasure: '',
+      oldMeasureFile: null,
+      newMeasureFile: null,
       diffs: [],
       diffCreated: false,
     };
@@ -69,6 +100,18 @@ export default {
   computed: {
     filesSelected() {
       return !!this.oldMeasure && !!this.newMeasure;
+    },
+    oldMeasure() {
+      if (this.oldMeasureFile) {
+        return this.zipUpload(this.oldMeasureFile);
+      }
+      return null;
+    },
+    newMeasure() {
+      if (this.newMeasureFile) {
+        return this.zipUpload(this.newMeasureFile);
+      }
+      return null;
     },
   },
   methods: {
@@ -100,14 +143,6 @@ export default {
         console.log(`Error reading zip: ${error}`);
       });
       return measure;
-    },
-    oldMeasureUpload() {
-      const [oldMeasureZip] = this.$refs.measureOld.files;
-      this.oldMeasure = this.zipUpload(oldMeasureZip);
-    },
-    newMeasureUpload() {
-      const [newMeasureZip] = this.$refs.measureNew.files;
-      this.newMeasure = this.zipUpload(newMeasureZip);
     },
     packageIsValid(measurePackage) {
       return !!measurePackage;
@@ -160,6 +195,7 @@ export default {
           newText: this.reorderNewLibrary(oldText, newText),
         });
       }
+      console.log(this.diffs);
     },
     createLibraryMap() {
       // use edit distance to determine which libraries from oldMeasure map to which in new
