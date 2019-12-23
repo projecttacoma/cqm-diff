@@ -40,13 +40,12 @@
   - display diffs on page
 */
 import * as Zip from '../lib/zip';
-import '../lib/z-worker'
 
 const { zip } = Zip;
 
 zip.workerScripts = {
   deflater: ['../lib/z-worker.js', '../lib/deflate.js'],
-  inflater: ['../lib/z-worker.js', '../lib/inflate.js']
+  inflater: ['../lib/z-worker.js', '../lib/inflate.js'],
 };
 
 export default {
@@ -64,40 +63,39 @@ export default {
     },
   },
   methods: {
-    oldMeasureUpload() {
-      const [oldMeasureZip] = this.$refs.measureOld.files;
-      // use a BlobReader to read the zip from a Blob object
-      zip.createReader(new zip.BlobReader(oldMeasureZip), (reader) => {
-        // get all entries from the zip
+    zipUpload(blob) {
+      const measure = {};
+      zip.createReader(new zip.BlobReader(blob), (reader) => {
         reader.getEntries((entries) => {
-          console.log(entries);
           if (entries.length) {
-            // get first entry content as text
-            entries[0].getData(new zip.TextWriter(), (text) => {
-              // text contains the entry data as a String
-              console.log(text);
-
-              // close the zip reader
-              reader.close(() => {
-                // onclose callback
-              });
-            }, (current, total) => {
-              console.log(current);
-              console.log(total);
-              // onprogress callback
-            });
+            for (let i = 1; i < entries.length; i += 1) {
+              const { filename } = entries[i];
+              // Only process cql files.
+              if (filename.match(/\.cql$/)) {
+                entries[i].getData(new zip.TextWriter(), (text) => {
+                  measure[filename] = text;
+                  reader.close(() => {
+                    console.log(`${filename} complete.`);
+                  });
+                }, (current, total) => {
+                  console.info(`${filename}: ${current}/${total}`);
+                });
+              }
+            }
           }
         });
       }, (error) => {
-        console.log(error);
-        // onerror callback
+        console.log(`Error reading zip: ${error}`);
       });
-
-      this.oldMeasure = { oldMeasureZip };
+      return measure;
+    },
+    oldMeasureUpload() {
+      const [oldMeasureZip] = this.$refs.measureOld.files;
+      this.oldMeasure = this.zipUpload(oldMeasureZip);
     },
     newMeasureUpload() {
       const [newMeasureZip] = this.$refs.measureNew.files;
-      this.newMeasure = { newMeasureZip };
+      this.newMeasure = this.zipUpload(newMeasureZip);
     },
     packageIsValid(measurePackage) {
       console.log(measurePackage);
