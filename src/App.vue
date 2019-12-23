@@ -25,15 +25,17 @@
         v-on:click.prevent="createDiff()">Create Diff</button>
       <button :disabled="!diffCreated"
         id="downloadDiffBtn"
-        v-on:click.prevent="downloadDiff()">Download Diff HTML</button>
+        v-on:click.prevent="downloadDiff()">Download Diff</button>
     </div>
 
-    <div v-for="diff in diffs" :key="diff.oldFileName">
-      Old: {{ diff.oldFileName }} New: {{ diff.newFileName }}
-      <code-diff :old-string="diff.oldText"
-                :new-string="diff.newText"
-                :context="1000"
-                :outputFormat="`side-by-side`"/>
+    <div id="diff">
+      <div v-for="diff in diffs" :key="diff.oldFileName">
+        Old: {{ diff.oldFileName }} New: {{ diff.newFileName }}
+        <code-diff :old-string="diff.oldText"
+                  :new-string="diff.newText"
+                  :context="1000"
+                  :outputFormat="`side-by-side`"/>
+      </div>
     </div>
   </div>
 </template>
@@ -169,11 +171,12 @@ export default {
         this.diff = 'invalid packages';
       } else {
         this.calculateDiff();
-        this.diffCreated = true;
+        // this.diffCreated = true;
+        this.diffCreated = false; // currently disabled
       }
     },
     downloadDiff() {
-
+      this.$htmlToPaper('diff');
     },
   },
 };
