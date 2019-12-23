@@ -23,22 +23,27 @@
       <button :disabled="!filesSelected"
         id="createDiffBtn"
         v-on:click.prevent="createDiff()">Create Diff</button>
+      <button :disabled="!diffCreated"
+        id="downloadDiffBtn"
+        v-on:click.prevent="downloadDiff()">Download Diff HTML</button>
     </div>
 
-    <div>
-      {{ diff }}
+    <div v-for="diff in diffs" :key="diff.oldFileName">
+      Old: {{ diff.oldFileName }} New: {{ diff.newFileName }}
+      <code-diff :old-string="diff.oldText"
+                :new-string="diff.newText"
+                :context="1000"
+                :outputFormat="`side-by-side`"/>
     </div>
   </div>
 </template>
 <script>
 /* TODO
   - CSS
-  - Unzip and parse libraries into separate {filename, string} tuples
-  - match filenames based on edit distance and create diff of each
-  - port diff from python to node
-  - integrate diff2html into web app
-  - display diffs on page
+  - download diffs button
 */
+import CodeDiff from 'vue-code-diff';
+import * as EditDistance from 'levenshtein-edit-distance';
 import * as Zip from '../lib/zip';
 
 const { zip } = Zip;
@@ -50,11 +55,13 @@ zip.workerScripts = {
 
 export default {
   name: 'cqm-diff',
+  components: { CodeDiff },
   data() {
     return {
       oldMeasure: '',
       newMeasure: '',
-      diff: '',
+      diffs: [],
+      diffCreated: false,
     };
   },
   computed: {
@@ -98,21 +105,75 @@ export default {
       this.newMeasure = this.zipUpload(newMeasureZip);
     },
     packageIsValid(measurePackage) {
-      console.log(measurePackage);
       return !!measurePackage;
     },
     validatePackages() {
       return this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
     },
+    reorderNewLibrary(oldLibrary, newLibrary) {
+      const oldSplit = oldLibrary.split('\n\n');
+      const newSplit = newLibrary.split('\n\n');
+      const paragraphMap = this.mapByEditDistance(oldSplit, newSplit);
+      return this.rebuildFromMapping(oldSplit, newSplit, paragraphMap);
+    },
+    rebuildFromMapping(oldStrings, newStrings, mapping) {
+      const reordered = [];
+      for (let i = 0; i < oldStrings.length; i += 1) {
+        const oldString = oldStrings[i];
+        reordered.push(mapping[oldString]);
+      }
+      return reordered.join('\n\n');
+    },
+    mapByEditDistance(oldStrings, newStrings) {
+      const distMap = {};
+      for (let i = 0; i < oldStrings.length; i += 1) {
+        const oldString = oldStrings[i];
+        let minDist = oldString.length;
+        for (let j = 0; j < newStrings.length; j += 1) {
+          const newString = newStrings[j];
+          const dist = EditDistance(oldString, newString);
+          if (dist < minDist) {
+            minDist = dist;
+            distMap[oldString] = newString;
+          }
+        }
+      }
+      return distMap;
+    },
     calculateDiff() {
-      this.diff = 'diff created';
+      const libraryMap = this.createLibraryMap();
+      console.log(libraryMap);
+      const oldFileNames = Object.keys(this.oldMeasure);
+      for (let i = 0; i < oldFileNames.length; i += 1) {
+        const oldFileName = oldFileNames[i];
+        const oldText = this.oldMeasure[oldFileName];
+        const newFileName = libraryMap[oldFileName];
+        const newText = this.newMeasure[newFileName];
+        this.diffs.push({
+          oldFileName,
+          newFileName,
+          oldText,
+          newText: this.reorderNewLibrary(oldText, newText),
+        });
+      }
+    },
+    createLibraryMap() {
+      // use edit distance to determine which libraries from oldMeasure map to which in new
+      const oldFileNames = Object.keys(this.oldMeasure);
+      const newFileNames = Object.keys(this.newMeasure);
+
+      return this.mapByEditDistance(oldFileNames, newFileNames);
     },
     createDiff() {
       if (!this.validatePackages()) {
         this.diff = 'invalid packages';
       } else {
         this.calculateDiff();
+        this.diffCreated = true;
       }
+    },
+    downloadDiff() {
+
     },
   },
 };

@@ -11,7 +11,9 @@
   "dependencies": {
     "buefy": "^0.8.8",
     "core-js": "^3.4.3",
-    "vue": "^2.6.10"
+    "levenshtein-edit-distance": "^2.0.4",
+    "vue": "^2.6.10",
+    "vue-code-diff": "^0.0.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
