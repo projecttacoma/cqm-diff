@@ -1,13 +1,22 @@
 {
   "name": "cqm-diff",
   "version": "0.1.0",
+  "description": "Web page that takes in two eCQM packages, re-orders the CQL in the second one to match the first (based on edit distance), and displays the diff between the two versions.",
   "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
+  "repository": "git+https://github.com/projecttacoma/cqm-diff.git",
+  "contributors": [
+    {
+      "name": "Luke Osborne",
+      "email": "lwosborne@mitre.org"
+    }
+  ],
   "dependencies": {
     "buefy": "^0.8.8",
     "core-js": "^3.4.3",

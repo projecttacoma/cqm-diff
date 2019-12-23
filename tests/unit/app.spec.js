@@ -75,43 +75,5 @@ describe('App.vue', () => {
       const diffButton = wrapper.find('#createDiffBtn');
       expect(diffButton.attributes().disabled).to.equal(undefined);
     });
-
-    it('Shows invalid package error message if either package is invalid', () => {
-      const wrapper = shallowMount(App, {
-        data() {
-          return {
-            oldMeasure: 'foo',
-            newMeasure: 'foo',
-          };
-        },
-        methods: {
-          packageIsValid() {
-            return false;
-          },
-        },
-      });
-      const diffButton = wrapper.find('#createDiffBtn');
-      diffButton.trigger('click');
-      expect(wrapper.text()).to.include('invalid packages');
-    });
-
-    it('Shows diff if both packages valid', () => {
-      const wrapper = shallowMount(App, {
-        data() {
-          return {
-            oldMeasure: 'foo',
-            newMeasure: 'foo',
-          };
-        },
-        methods: {
-          packageIsValid() {
-            return true;
-          },
-        },
-      });
-      const diffButton = wrapper.find('#createDiffBtn');
-      diffButton.trigger('click');
-      expect(wrapper.text()).to.include('diff created');
-    });
   });
 });
