@@ -30,20 +30,27 @@
     </div>
   </div>
 </template>
-
 <script>
 /* TODO
   - CSS
-  - Input validation for file uploads
   - Unzip and parse libraries into separate {filename, string} tuples
   - match filenames based on edit distance and create diff of each
   - port diff from python to node
   - integrate diff2html into web app
   - display diffs on page
 */
+import * as Zip from '../lib/zip';
+import '../lib/z-worker'
+
+const { zip } = Zip;
+
+zip.workerScripts = {
+  deflater: ['../lib/z-worker.js', '../lib/deflate.js'],
+  inflater: ['../lib/z-worker.js', '../lib/inflate.js']
+};
 
 export default {
-  name: 'app',
+  name: 'cqm-diff',
   data() {
     return {
       oldMeasure: '',
@@ -58,12 +65,42 @@ export default {
   },
   methods: {
     oldMeasureUpload() {
-      this.oldMeasure = this.$refs.measureOld.files;
+      const [oldMeasureZip] = this.$refs.measureOld.files;
+      // use a BlobReader to read the zip from a Blob object
+      zip.createReader(new zip.BlobReader(oldMeasureZip), (reader) => {
+        // get all entries from the zip
+        reader.getEntries((entries) => {
+          console.log(entries);
+          if (entries.length) {
+            // get first entry content as text
+            entries[0].getData(new zip.TextWriter(), (text) => {
+              // text contains the entry data as a String
+              console.log(text);
+
+              // close the zip reader
+              reader.close(() => {
+                // onclose callback
+              });
+            }, (current, total) => {
+              console.log(current);
+              console.log(total);
+              // onprogress callback
+            });
+          }
+        });
+      }, (error) => {
+        console.log(error);
+        // onerror callback
+      });
+
+      this.oldMeasure = { oldMeasureZip };
     },
     newMeasureUpload() {
-      this.newMeasure = this.$refs.measureNew.files;
+      const [newMeasureZip] = this.$refs.measureNew.files;
+      this.newMeasure = { newMeasureZip };
     },
     packageIsValid(measurePackage) {
+      console.log(measurePackage);
       return !!measurePackage;
     },
     validatePackages() {

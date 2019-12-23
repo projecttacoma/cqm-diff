@@ -27,7 +27,10 @@ describe('App.vue', () => {
     expect(wrapper.text()).to.include(text);
   });
 
-  describe('File Upload', () => {
+  describe('File Parsing', () => {
+  });
+
+  describe('Create Diff Button', () => {
     it('Create Diff Button Disabled if no files selected', () => {
       const wrapper = shallowMount(App);
       const diffButton = wrapper.find('#createDiffBtn');
