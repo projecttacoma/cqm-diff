@@ -17,7 +17,7 @@
     <div class="navbar-brand">
     </div>
 
-    <div class="container">
+    <div>
       <div class="columns">
         <div class="column is-one-third">
           <b-field class="file">
@@ -69,10 +69,7 @@
     </div>
 </template>
 <script>
-/* TODO
-  - CSS
-  - download diffs button
-*/
+
 import * as EditDistance from 'levenshtein-edit-distance';
 import * as Zip from '../lib/zip';
 import Diff from '@/components/Diff.vue';
