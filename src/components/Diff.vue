@@ -1,11 +1,11 @@
 <template>
-  <div class="container">
+  <div>
     <div class="columns diff-header">
       <div class="column is-half">
-        <span> {{ oldFileName }} </span>
+        <span class="diff-filename">{{ oldFileName }}</span>
       </div>
       <div class="column is-half">
-        <span> {{ newFileName }} </span>
+        <span class="diff-filename">{{ newFileName }}</span>
       </div>
     </div>
     <div class="diff-body">
@@ -30,5 +30,11 @@ export default {
 <style scoped lang="scss">
 .diff-header {
   font-family:'Courier New', Courier, monospace
+}
+.diff-filename {
+  display: block;
+  white-space: wrap;
+  overflow: hidden;
+  width: 600px;
 }
 </style>

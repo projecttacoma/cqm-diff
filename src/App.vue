@@ -27,9 +27,9 @@
                   <span>Upload Old Measure Zip</span>
                 </a>
               </b-upload>
-              <span class="file-name" v-if="oldMeasureFile">
+              <div class="file-name" v-if="oldMeasureFile">
                 {{ oldMeasureFile.name }}
-              </span>
+              </div>
           </b-field>
         </div>
         <div class="column is-one-third">
@@ -40,23 +40,23 @@
                   <span>Upload New Measure Zip</span>
                 </a>
               </b-upload>
-              <span class="file-name" v-if="newMeasureFile">
+              <div class="file-name" v-if="newMeasureFile">
                 {{ newMeasureFile.name }}
-              </span>
+              </div>
           </b-field>
         </div>
-          <div class="column is-one-third">
-            <b-button :disabled="!filesSelected"
-              id="createDiffBtn"
-              class="is-primary"
-              v-on:click.prevent="createDiff()">Create Diff
-            </b-button>
-          <!-- <b-button :disabled="!diffCreated"
-            class="primary"
-            id="downloadDiffBtn"
-            v-on:click.prevent="downloadDiff()">Download Diff
-            </b-button> -->
-          </div>
+        <div class="column is-one-third">
+          <b-button :disabled="!filesSelected"
+            id="createDiffBtn"
+            class="is-primary"
+          v-on:click.prevent="createDiff()">Create Diff
+        </b-button>
+        <!-- <b-button :disabled="!diffCreated"
+          class="primary"
+          id="downloadDiffBtn"
+          v-on:click.prevent="downloadDiff()">Download Diff
+          </b-button> -->
+        </div>
         </div>
         <diff v-for="diff in diffs"
               v-bind:key="diff"
@@ -185,15 +185,34 @@ export default {
       const oldFileNames = Object.keys(this.oldMeasure);
       for (let i = 0; i < oldFileNames.length; i += 1) {
         const oldFileName = oldFileNames[i];
-        const oldText = this.oldMeasure[oldFileName];
-        const newFileName = libraryMap[oldFileName];
-        const newText = this.newMeasure[newFileName];
-        this.diffs.push({
-          oldFileName,
-          newFileName,
-          oldText,
-          newText: this.reorderNewLibrary(oldText, newText),
-        });
+        // Ignore mac temp files
+        if (!oldFileName.match(/MACOSX/)) {
+          let oldText = this.oldMeasure[oldFileName];
+          const newFileName = libraryMap[oldFileName];
+          let newText = this.newMeasure[newFileName];
+
+          // Get rid of carriage returns, some measures have them some don't
+          oldText = oldText.replace(/\r/g, '');
+          newText = newText.replace(/\r/g, '');
+          // Replace tabs with 2 spaces due to inconsistencies between 2019/2020
+          // 2019 uses 2 tab indentation, 2020 uses 2 spaces followed by a tab
+          oldText = oldText.replace(/\t/g, '  ');
+          newText = newText.replace(/\t/g, '  ');
+          const before = newText;
+
+          newText = this.reorderNewLibrary(oldText, newText);
+          const after = newText;
+          if (before === after) {
+            console.log('didnt reorder');
+          }
+
+          this.diffs.push({
+            oldFileName,
+            newFileName,
+            oldText,
+            newText,
+          });
+        }
       }
     },
     createLibraryMap() {
