@@ -203,6 +203,7 @@ export default {
           newText = this.reorderNewLibrary(oldText, newText);
           const after = newText;
           if (before === after) {
+            // eslint-disable-next-line no-console
             console.log('didnt reorder');
           }
 
