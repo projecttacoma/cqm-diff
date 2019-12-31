@@ -3,7 +3,7 @@
   <div id="app">
     <section class="hero is-info">
       <div class="hero-body">
-        <div class="container">
+        <div>
           <h1 class="title">
             cqm-diff
           </h1>
