@@ -178,6 +178,7 @@ export default {
       return distMap;
     },
     calculateDiff() {
+      this.diffs = [];
       const libraryMap = this.createLibraryMap();
       const oldFileNames = Object.keys(this.oldMeasure);
       for (let i = 0; i < oldFileNames.length; i += 1) {
