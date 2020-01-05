@@ -150,7 +150,7 @@ export default {
         });
       }, (error) => {
         // eslint-disable-next-line no-console
-        console.log(`Error reading zip: ${error}`);
+        console.log(`Error reading zip: ${error.message}`);
       });
       Promise.all(promises);
       return measure;

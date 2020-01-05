@@ -3,6 +3,8 @@
 
 # cqm-diff
 
+https://projecttacoma.github.io/cqm-diff
+
 ## Project setup
 ```
 yarn install
@@ -42,7 +44,7 @@ docker build . -t cqm-diff
 docker run -d -p 8080:80 cqm-diff
 ```
 
-App is now available at http://localhost:8080
+App is now available at http://localhost:8080/cqm-diff
 
 
 
