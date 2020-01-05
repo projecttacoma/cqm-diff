@@ -59,7 +59,7 @@
         </div>
         </div>
         <diff v-for="diff in diffs"
-              v-bind:key="diff"
+              v-bind:key="diff.oldFileName"
               v-bind:oldFileName="diff.oldFileName"
               v-bind:newFileName="diff.newFileName"
               v-bind:oldText="diff.oldText"
@@ -114,31 +114,34 @@ export default {
   methods: {
     zipUpload(blob) {
       const measure = {};
+      const promises = [];
       zip.createReader(new zip.BlobReader(blob), (reader) => {
         reader.getEntries((entries) => {
           if (entries.length) {
-            for (let i = 1; i < entries.length; i += 1) {
-              const { filename } = entries[i];
-              // Only process cql files.
-              if (filename.match(/\.cql$/)) {
-                entries[i].getData(new zip.TextWriter(), (text) => {
-                  measure[filename] = text;
-                  reader.close(() => {
+            for (let i = 0; i < entries.length; i += 1) {
+              promises.push(new Promise(() => {
+                const { filename } = entries[i];
+                // Only process cql files.
+                if (filename.match(/\.cql$/)) {
+                  entries[i].getData(new zip.TextWriter(), (text) => {
+                    measure[filename] = text;
                     // eslint-disable-next-line no-console
                     console.log(`${filename} complete.`);
+                  }, (current, total) => {
+                    // eslint-disable-next-line no-console
+                    console.info(`${filename}: ${current}/${total}`);
                   });
-                }, (current, total) => {
-                  // eslint-disable-next-line no-console
-                  console.info(`${filename}: ${current}/${total}`);
-                });
-              }
+                }
+              }));
             }
           }
         });
+        reader.close();
       }, (error) => {
         // eslint-disable-next-line no-console
         console.log(`Error reading zip: ${error}`);
       });
+      Promise.all(promises);
       return measure;
     },
     packageIsValid(measurePackage) {
@@ -196,14 +199,8 @@ export default {
           // 2019 uses 2 tab indentation, 2020 uses 2 spaces followed by a tab
           oldText = oldText.replace(/\t/g, '  ');
           newText = newText.replace(/\t/g, '  ');
-          const before = newText;
 
           newText = this.reorderNewLibrary(oldText, newText);
-          const after = newText;
-          if (before === after) {
-            // eslint-disable-next-line no-console
-            console.log('didnt reorder');
-          }
 
           this.diffs.push({
             oldFileName,
@@ -216,8 +213,9 @@ export default {
     },
     createLibraryMap() {
       // use edit distance to determine which libraries from oldMeasure map to which in new
-      const oldFileNames = Object.keys(this.oldMeasure);
-      const newFileNames = Object.keys(this.newMeasure);
+      // Do not use temp files from the zip library as keys
+      const oldFileNames = Object.keys(this.oldMeasure).filter(fn => !fn.match('MACOSX'));
+      const newFileNames = Object.keys(this.newMeasure).filter(fn => !fn.match('MACOSX'));
 
       return this.mapByEditDistance(oldFileNames, newFileNames);
     },
