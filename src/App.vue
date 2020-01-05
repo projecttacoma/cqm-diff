@@ -89,8 +89,8 @@ import Diff from '@/components/Diff.vue';
 const { zip } = Zip;
 
 zip.workerScripts = {
-  deflater: [Path.resolve('../lib/z-worker.js'), Path.resolve('../lib/deflate.js')],
-  inflater: [Path.resolve('../lib/z-worker.js'), Path.resolve('../lib/inflate.js')],
+  deflater: [Path.resolve(`${window.location.pathname}/lib/z-worker.js`), Path.resolve(`${window.location.pathname}/lib/deflate.js`)],
+  inflater: [Path.resolve(`${window.location.pathname}/lib/z-worker.js`), Path.resolve(`${window.location.pathname}/lib/inflate.js`)],
 };
 
 export default {
