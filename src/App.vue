@@ -45,18 +45,25 @@
               </div>
           </b-field>
         </div>
-        <div class="column is-one-third">
+        <div class="column is-one-sixth">
           <b-button :disabled="!filesSelected"
             id="createDiffBtn"
             class="is-primary"
           v-on:click.prevent="createDiff()">Create Diff
         </b-button>
+        </div>
+        <div class="column is-one-sixth">
+          <b-switch v-model="reorder"
+                  true-value="Auto-Reorder New Measure CQL"
+                  false-value="Do not reorder New Measure CQL">
+                  {{ reorder }}
+          </b-switch>
+        </div>
         <!-- <b-button :disabled="!diffCreated"
           class="primary"
           id="downloadDiffBtn"
           v-on:click.prevent="downloadDiff()">Download Diff
           </b-button> -->
-        </div>
         </div>
         <diff v-for="diff in diffs"
               v-bind:key="diff.oldFileName"
@@ -96,6 +103,7 @@ export default {
       newMeasureFile: null,
       diffs: [],
       diffCreated: false,
+      reorder: 'Auto-Reorder New Measure CQL',
     };
   },
   computed: {
@@ -236,7 +244,9 @@ export default {
           oldText = oldText.replace(/\t/g, '  ');
           newText = newText.replace(/\t/g, '  ');
 
-          newText = this.reorderNewLibrary(oldText, newText);
+          if (this.reorder === 'Auto-Reorder New Measure CQL') {
+            newText = this.reorderNewLibrary(oldText, newText);
+          }
 
           this.diffs.push({
             oldFileName,
