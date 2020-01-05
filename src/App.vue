@@ -82,14 +82,15 @@
 */
 
 import * as EditDistance from 'levenshtein-edit-distance';
+import * as Path from 'path';
 import * as Zip from '../public/lib/zip';
 import Diff from '@/components/Diff.vue';
 
 const { zip } = Zip;
 
 zip.workerScripts = {
-  deflater: ['../../z-worker.js', '../../deflate.js'],
-  inflater: ['../../lib/z-worker.js', '../../lib/inflate.js'],
+  deflater: [Path.resolve('../lib/z-worker.js'), Path.resolve('../lib/deflate.js')],
+  inflater: [Path.resolve('../lib/z-worker.js'), Path.resolve('../lib/inflate.js')],
 };
 
 export default {
