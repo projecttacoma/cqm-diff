@@ -136,7 +136,6 @@ export default {
             }
           }
         });
-        reader.close();
       }, (error) => {
         // eslint-disable-next-line no-console
         console.log(`Error reading zip: ${error}`);
