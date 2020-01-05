@@ -19,7 +19,6 @@ context Patient
 define "AAASDE Ethnicity":
 	["Patient Characteristic Ethnicity": "Ethnicity"]
 
-
 define "SDE Race":
 	["Patient Characteristic Race": "Race"]
 
@@ -28,7 +27,6 @@ define "SDE Sex":
 
 define "SDE Payer":
 	["Patient Characteristic Payer": "Payer"]
-
 
 define "Numerator":
 	exists ["Diagnostic Study, Order": "DXA (Dual energy Xray Absorptiometry) Scan"] DXA

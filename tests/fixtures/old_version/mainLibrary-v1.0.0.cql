@@ -34,3 +34,7 @@ define "Denominator":
 define "Numerator":
 	exists ["Diagnostic Study, Order": "DXA (Dual energy Xray Absorptiometry) Scan"] DXA
 		where DXA.authorDatetime during "Measurement Period"
+
+define "Extra Define":
+	["Patient Characteristic Sex": "ONC Administrative Sex"]
+

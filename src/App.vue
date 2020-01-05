@@ -69,6 +69,10 @@
     </div>
 </template>
 <script>
+/* TODO
+ - Handle single CQL files in addition to zip files
+ - html export
+*/
 
 import * as EditDistance from 'levenshtein-edit-distance';
 import * as Zip from '../lib/zip';
@@ -157,27 +161,60 @@ export default {
     },
     rebuildFromMapping(oldStrings, newStrings, mapping) {
       const reordered = [];
+      const usedNewStrings = {};
+      for (let i = 0; i < newStrings.length; i += 1) {
+        const newString = newStrings[i];
+        usedNewStrings[newString] = false;
+      }
       for (let i = 0; i < oldStrings.length; i += 1) {
         const oldString = oldStrings[i];
-        reordered.push(mapping[oldString]);
+        if (mapping[oldString]) {
+          reordered.push(mapping[oldString]);
+          usedNewStrings[mapping[oldString]] = true;
+        }
+      }
+      for (let i = 0; i < newStrings.length; i += 1) {
+        const newString = newStrings[i];
+        if (!usedNewStrings[newString]) {
+          reordered.push(newString);
+        }
       }
       return reordered.join('\n\n');
     },
     mapByEditDistance(oldStrings, newStrings) {
-      const distMap = {};
+      const dists = {};
+      // calculate the distance from each oldString to every newString
       for (let i = 0; i < oldStrings.length; i += 1) {
         const oldString = oldStrings[i];
-        let minDist = oldString.length;
+        dists[oldString] = [];
         for (let j = 0; j < newStrings.length; j += 1) {
           const newString = newStrings[j];
           const dist = EditDistance(oldString, newString);
-          if (dist < minDist) {
-            minDist = dist;
-            distMap[oldString] = newString;
-          }
+          dists[oldString].push({ dist, newString });
         }
+        dists[oldString].sort((a, b) => a.dist - b.dist);
       }
-      return distMap;
+      // eslint-disable-next-line arrow-body-style
+      const oldStringsToMinDists = Object.keys(dists).map((key) => {
+        return { key, dist: dists[key][0].dist };
+      });
+      oldStringsToMinDists.sort((a, b) => a.dist - b.dist);
+      const oldStringsInOrder = oldStringsToMinDists.map(s => s.key);
+      // set the matches from min distance and dont reuse newStrings
+      // match each oldString to its corresponding newString
+      const matches = {};
+      const newStringsAlreadyMatched = {};
+      oldStringsInOrder.forEach((oldString) => {
+        const match = dists[oldString][0].newString;
+        if (!newStringsAlreadyMatched[match]) {
+          matches[oldString] = match;
+          newStringsAlreadyMatched[match] = true;
+        } else {
+          // If there's an extra paragraph in the old measure, don't match it with anything
+          matches[oldString] = null;
+        }
+      });
+      return matches;
     },
     calculateDiff() {
       this.diffs = [];
