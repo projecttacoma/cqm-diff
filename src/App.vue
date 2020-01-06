@@ -1,4 +1,3 @@
-
 <template>
   <div id="app">
     <section class="hero is-info">
@@ -11,8 +10,15 @@
             Upload two versions of an eCQM Measure Authoring Tool (MAT)
             package (.zip files) and click "Create Diff" to see the changes
             between their CQL files. </h2>
-            Measure packages submitted are processed completely in the browser and
-            are not uploaded to github.io or to any external/cloud storage.</div>
+          Measure packages submitted are processed completely in the browser and
+            are not uploaded to github.io or to any external/cloud storage.
+          <a href="https://github.com/projecttacoma/cqm-diff">
+            <b-button size="is-small">
+              <font-awesome-icon :icon="['fab', 'github']" />
+              Source
+            </b-button>
+          </a>
+        </div>
       </div>
     </section>
     <div class="navbar-brand">
@@ -74,12 +80,12 @@
               v-bind:newText="diff.newText">
         </diff>
       </div>
+
     </div>
 </template>
 <script>
 /* TODO
  - Handle single CQL files in addition to zip files
- - html export
 */
 
 import * as EditDistance from 'levenshtein-edit-distance';
