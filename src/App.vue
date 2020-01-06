@@ -11,7 +11,8 @@
             Upload two versions of an eCQM Measure Authoring Tool (MAT)
             package (.zip files) and click "Create Diff" to see the changes
             between their CQL files. </h2>
-        </div>
+            Measure packages submitted are processed completely in the browser and
+            are not uploaded to github.io or to any external/cloud storage.</div>
       </div>
     </section>
     <div class="navbar-brand">
