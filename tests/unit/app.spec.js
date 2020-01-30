@@ -14,13 +14,13 @@ describe('App.vue', () => {
   });
 
   it('Contains Old Measure Upload Input', () => {
-    const text = 'Upload Old Measure Zip';
+    const text = 'Upload Old Measure';
     const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
   it('Contains New Measure Upload Input', () => {
-    const text = 'Upload New Measure Zip';
+    const text = 'Upload New Measure';
     const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
