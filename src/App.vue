@@ -8,8 +8,8 @@
           </h1>
           <h2 class="subtitle">
             Upload two versions of an eCQM Measure Authoring Tool (MAT)
-            package (.zip files) and click "Create Diff" to see the changes
-            between their CQL files. </h2>
+            package (.zip files or .cql files) and click "Create Diff" to see
+            the changes between their CQL files. </h2>
           Measure packages submitted are processed completely in the browser and
             are not uploaded to github.io or to any external/cloud storage.
           <a href="https://github.com/projecttacoma/cqm-diff">
@@ -31,7 +31,7 @@
               <b-upload v-model="oldMeasureFile">
                 <a class="button is-info">
                   <b-icon icon="upload"></b-icon>
-                  <span>Upload Old Measure Zip</span>
+                  <span>Upload Old Measure (.zip|.cql)</span>
                 </a>
               </b-upload>
               <div class="file-name" v-if="oldMeasureFile">
@@ -44,7 +44,7 @@
               <b-upload v-model="newMeasureFile">
                 <a class="button is-info">
                   <b-icon icon="upload"></b-icon>
-                  <span>Upload New Measure Zip</span>
+                  <span>Upload New Measure (.zip|.cql)</span>
                 </a>
               </b-upload>
               <div class="file-name" v-if="newMeasureFile">
@@ -120,18 +120,35 @@ export default {
     },
     oldMeasure() {
       if (this.oldMeasureFile) {
+        if (this.oldMeasureFile.name !== undefined
+          && this.oldMeasureFile.name.match(/\.cql$/)) {
+          return this.cqlUpload(this.oldMeasureFile);
+        }
         return this.zipUpload(this.oldMeasureFile);
       }
       return null;
     },
     newMeasure() {
       if (this.newMeasureFile) {
+        if (this.newMeasureFile.name !== undefined
+          && this.newMeasureFile.name.match(/\.cql$/)) {
+          return this.cqlUpload(this.newMeasureFile);
+        }
         return this.zipUpload(this.newMeasureFile);
       }
       return null;
     },
   },
   methods: {
+    cqlUpload(blob) {
+      const measure = {};
+      const reader = new FileReader();
+      reader.onload = (fileLoadedEvent) => {
+        measure[blob.name] = fileLoadedEvent.target.result;
+      };
+      reader.readAsText(blob, 'UTF-8');
+      return measure;
+    },
     zipUpload(blob) {
       const measure = {};
       const promises = [];
@@ -167,7 +184,8 @@ export default {
       return !!measurePackage;
     },
     validatePackages() {
-      return this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
+      return Object.keys(this.oldMeasure).length === Object.keys(this.newMeasure).length
+        && this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
     },
     reorderNewLibrary(oldLibrary, newLibrary) {
       const oldSplit = oldLibrary.split('\n\n');

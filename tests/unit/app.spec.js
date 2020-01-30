@@ -14,13 +14,13 @@ describe('App.vue', () => {
   });
 
   it('Contains Old Measure Upload Input', () => {
-    const text = 'Upload Old Measure Zip';
+    const text = 'Upload Old Measure';
     const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
 
   it('Contains New Measure Upload Input', () => {
-    const text = 'Upload New Measure Zip';
+    const text = 'Upload New Measure';
     const wrapper = mount(App);
     expect(wrapper.text()).to.include(text);
   });
@@ -31,7 +31,12 @@ describe('App.vue', () => {
     expect(wrapper.text()).to.include(text);
   });
 
-  describe('File Parsing', () => {
+  describe('Diff', () => {
+    it('Reorders and computes correctly', () => {
+      const wrapper = mount(App);
+      const diffButton = wrapper.find('#createDiffBtn');
+      expect(diffButton.attributes().disabled).to.equal('disabled');
+    });
   });
 
   describe('Create Diff Button', () => {
