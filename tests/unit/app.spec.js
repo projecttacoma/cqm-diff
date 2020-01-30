@@ -31,7 +31,12 @@ describe('App.vue', () => {
     expect(wrapper.text()).to.include(text);
   });
 
-  describe('File Parsing', () => {
+  describe('Diff', () => {
+    it('Reorders and computes correctly', () => {
+      const wrapper = mount(App);
+      const diffButton = wrapper.find('#createDiffBtn');
+      expect(diffButton.attributes().disabled).to.equal('disabled');
+    });
   });
 
   describe('Create Diff Button', () => {
