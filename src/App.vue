@@ -84,10 +84,6 @@
     </div>
 </template>
 <script>
-/* TODO
- - Handle single CQL files in addition to zip files
-*/
-
 import * as EditDistance from 'levenshtein-edit-distance';
 import * as Path from 'path';
 import * as Zip from '../public/lib/zip';
@@ -223,7 +219,32 @@ export default {
         dists[oldString] = [];
         for (let j = 0; j < newStrings.length; j += 1) {
           const newString = newStrings[j];
-          const dist = EditDistance(oldString, newString);
+          /*
+            Matching Algorithm:
+              1. If we are comparing anything except 2 define statements, just use
+              edit distance.
+              2. If two define statements, use the weighted sum of the edit
+              distance of the define label itself and the whole statement.
+          */
+          const statementDist = EditDistance(oldString, newString);
+          const oldDefine = oldString.match(/define "(.*)":/);
+          const newDefine = newString.match(/define "(.*)":/);
+          let defineDist = -1;
+          if (oldDefine && newDefine
+            && oldDefine.length > 1 && newDefine.length > 1) {
+            defineDist = EditDistance(oldDefine[1], newDefine[1]);
+          }
+
+          let dist = statementDist;
+
+          if (defineDist !== -1) {
+            dist = 0.5 * defineDist + 0.5 * statementDist;
+          }
+
+          if (defineDist === 0) {
+            dist = 0;
+          }
+
           dists[oldString].push({ dist, newString });
         }
         dists[oldString].sort((a, b) => a.dist - b.dist);
