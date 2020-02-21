@@ -1,6 +1,6 @@
 {
   "name": "cqm-diff",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Web page that takes in two eCQM packages, re-orders the CQL in the second one to match the first (based on edit distance), and displays the diff between the two versions.",
   "private": true,
   "license": "Apache-2.0",
