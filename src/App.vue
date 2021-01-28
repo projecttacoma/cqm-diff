@@ -86,8 +86,8 @@
 <script>
 import * as EditDistance from 'levenshtein-edit-distance';
 import * as Path from 'path';
-import * as Zip from '../public/lib/zip';
 import Diff from '@/components/Diff.vue';
+import * as Zip from '../public/lib/zip';
 
 const { zip } = Zip;
 
