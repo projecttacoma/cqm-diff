@@ -184,10 +184,18 @@ export default {
         && this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
     },
     reorderNewLibrary(oldLibrary, newLibrary) {
-      const oldSplit = oldLibrary.split('\n\n');
-      const newSplit = newLibrary.split('\n\n');
+      const oldLibraryParts = oldLibrary.split('context Patient\n\n');
+      const oldLibraryBody = oldLibraryParts[1];
+
+      const newLibraryParts = newLibrary.split('context Patient\n\n');
+      const newLibraryHeader = newLibraryParts[0];
+      const newLibraryBody = newLibraryParts[1];
+
+      const oldSplit = oldLibraryBody.split('\n\n');
+      const newSplit = newLibraryBody.split('\n\n');
       const paragraphMap = this.mapByEditDistance(oldSplit, newSplit);
-      return this.rebuildFromMapping(oldSplit, newSplit, paragraphMap);
+      const newLibraryOrderedBody = this.rebuildFromMapping(oldSplit, newSplit, paragraphMap);
+      return `${newLibraryHeader}context Patient\n\n${newLibraryOrderedBody}`;
     },
     rebuildFromMapping(oldStrings, newStrings, mapping) {
       const reordered = [];

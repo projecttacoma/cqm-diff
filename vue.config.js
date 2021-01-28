@@ -1,4 +1,4 @@
 module.exports = {
-  publicPath: "/cqm-diff",
-  outputDir: "docs"
+  publicPath: '/cqm-diff',
+  outputDir: 'docs',
 };
