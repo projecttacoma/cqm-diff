@@ -180,12 +180,18 @@ export default {
       return !!measurePackage;
     },
     validatePackages() {
-      return Object.keys(this.oldMeasure).length === Object.keys(this.newMeasure).length
+      return Object.keys(this.oldMeasure).length > 0 && Object.keys(this.newMeasure).length > 0
         && this.packageIsValid(this.oldMeasure) && this.packageIsValid(this.newMeasure);
     },
     reorderNewLibrary(oldLibrary, newLibrary) {
-      const oldLibraryParts = oldLibrary.split('context Patient\n\n');
-      const oldLibraryBody = oldLibraryParts[1];
+      let oldLibraryBody;
+      if (oldLibrary !== '') {
+        const oldLibraryParts = oldLibrary.split('context Patient\n\n');
+        // eslint-disable-next-line prefer-destructuring
+        oldLibraryBody = oldLibraryParts[1];
+      } else {
+        oldLibraryBody = '';
+      }
 
       const newLibraryParts = newLibrary.split('context Patient\n\n');
       const newLibraryHeader = newLibraryParts[0];
@@ -282,12 +288,18 @@ export default {
     calculateDiff() {
       this.diffs = [];
       const libraryMap = this.createLibraryMap();
-      const oldFileNames = Object.keys(this.oldMeasure);
+      const oldFileNames = Object.keys(libraryMap);
       for (let i = 0; i < oldFileNames.length; i += 1) {
-        const oldFileName = oldFileNames[i];
+        let oldFileName = oldFileNames[i];
         // Ignore mac temp files
         if (!oldFileName.match(/MACOSX/)) {
-          let oldText = this.oldMeasure[oldFileName];
+          let oldText;
+          // if there was no before file, use empty string
+          if (oldFileName.startsWith('NA')) {
+            oldText = '';
+          } else {
+            oldText = this.oldMeasure[oldFileName];
+          }
           const newFileName = libraryMap[oldFileName];
           let newText = this.newMeasure[newFileName];
 
@@ -303,6 +315,9 @@ export default {
             newText = this.reorderNewLibrary(oldText, newText);
           }
 
+          if (oldFileName.startsWith('NA')) {
+            oldFileName = 'not found';
+          }
           this.diffs.push({
             oldFileName,
             newFileName,
@@ -318,7 +333,18 @@ export default {
       const oldFileNames = Object.keys(this.oldMeasure).filter(fn => !fn.match('MACOSX'));
       const newFileNames = Object.keys(this.newMeasure).filter(fn => !fn.match('MACOSX'));
 
-      return this.mapByEditDistance(oldFileNames, newFileNames);
+      const libMap = this.mapByEditDistance(oldFileNames, newFileNames);
+      if (newFileNames.length > oldFileNames.length) {
+        const foundNewMatches = Object.values(libMap);
+        let newFileIndex = 0;
+        newFileNames.forEach((newFile) => {
+          if (!foundNewMatches.includes(newFile)) {
+            libMap[`NA-${newFileIndex}`] = newFile;
+            newFileIndex += 1;
+          }
+        });
+      }
+      return libMap;
     },
     createDiff() {
       if (!this.validatePackages()) {
