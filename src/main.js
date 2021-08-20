@@ -28,5 +28,5 @@ const options = {
 Vue.use(VueHtmlToPaper, options);
 
 new Vue({
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');

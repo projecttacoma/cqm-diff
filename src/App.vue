@@ -268,7 +268,7 @@ export default {
         return { key, dist: dists[key][0].dist };
       });
       oldStringsToMinDists.sort((a, b) => a.dist - b.dist);
-      const oldStringsInOrder = oldStringsToMinDists.map(s => s.key);
+      const oldStringsInOrder = oldStringsToMinDists.map((s) => s.key);
       // set the matches from min distance and dont reuse newStrings
       // match each oldString to its corresponding newString
       const matches = {};
@@ -330,8 +330,8 @@ export default {
     createLibraryMap() {
       // use edit distance to determine which libraries from oldMeasure map to which in new
       // Do not use temp files from the zip library as keys
-      const oldFileNames = Object.keys(this.oldMeasure).filter(fn => !fn.match('MACOSX'));
-      const newFileNames = Object.keys(this.newMeasure).filter(fn => !fn.match('MACOSX'));
+      const oldFileNames = Object.keys(this.oldMeasure).filter((fn) => !fn.match('MACOSX'));
+      const newFileNames = Object.keys(this.newMeasure).filter((fn) => !fn.match('MACOSX'));
 
       const libMap = this.mapByEditDistance(oldFileNames, newFileNames);
       if (newFileNames.length > oldFileNames.length) {
