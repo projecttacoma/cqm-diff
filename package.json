@@ -27,7 +27,7 @@
     "levenshtein-edit-distance": "^2.0.4",
     "path": "^0.12.7",
     "vue": "^2.6.10",
-    "vue-code-diff": "^1.2.0",
+    "vue-code-diff": "=0.0.5",
     "vue-html-to-paper": "^1.1.1"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-vue": "^5.0.0",
-    "node-sass": "^4.14.0",
+    "sass": "^1.38.0",
     "sass-loader": "^8.0.0",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.36.0"
